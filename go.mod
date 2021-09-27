@@ -1,3 +1,5 @@
+// +heroku goVersion go1.16
+
 module github.com/endriu00/DiscordBuilderBot
 
 go 1.16
