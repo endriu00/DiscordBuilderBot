@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// `Config` is the configuration for the bot.
 type Config struct {
 	GuildID          string
 	BuildChannelID   string
