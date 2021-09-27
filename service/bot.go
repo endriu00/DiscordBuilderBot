@@ -5,6 +5,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type Config struct {
+	GuildID          string
+	BuildChannelID   string
+	Log              *logrus.Entry
+	ChannelsToCreate map[string]dgo.ChannelType
+}
+
 // `_bot` represents the bot.
 type _bot struct {
 	// `guildID` is the ID of the guild (also called server).
@@ -19,4 +26,13 @@ type _bot struct {
 
 	// `channelsToCreate` represents the name of the channels to be created.
 	channelsToCreate map[string]dgo.ChannelType
+}
+
+func New(cfg Config) *_bot {
+	return &_bot{
+		guildID:          cfg.GuildID,
+		buildChannelID:   cfg.BuildChannelID,
+		log:              cfg.Log,
+		channelsToCreate: cfg.ChannelsToCreate,
+	}
 }
