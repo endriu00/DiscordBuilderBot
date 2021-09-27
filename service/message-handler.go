@@ -10,6 +10,7 @@ import (
 func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
 
+	// TODO: add a ! check at the beginning of the message
 	// If the message was sent to a channel different from the one used for categories creation
 	// or if the author of the message was the bot itself
 	if message.ChannelID != bot.buildChannelID || message.Author.ID == session.State.User.ID {

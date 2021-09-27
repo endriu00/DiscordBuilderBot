@@ -39,7 +39,7 @@ func run() error {
 	})
 
 	// Start a new discord session
-	session, err := dgo.New(os.Getenv("TOKEN"))
+	session, err := dgo.New("Bot " + os.Getenv("TOKEN"))
 	if err != nil {
 		sysLog.WithError(err).Error("Could not create a new session.")
 		return err
