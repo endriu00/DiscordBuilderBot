@@ -1,9 +1,12 @@
 package service
 
 import (
+	"errors"
 	dgo "github.com/bwmarrin/discordgo"
 	"github.com/sirupsen/logrus"
 )
+
+var ErrNotCommand = errors.New("message content is not a command")
 
 // `Config` is the configuration for the bot.
 type Config struct {
