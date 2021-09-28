@@ -64,4 +64,12 @@ func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.M
 			return
 		}
 	}
+
+	// Send back a message
+	// TODO: create a function for sending messages. Send a message back when an error occurs
+	_, err = session.ChannelMessageSend(bot.buildChannelID, "Already done, pal!")
+	if err != nil {
+		bot.log.WithError(err).Error("Could not send a message.")
+		return
+	}
 }
