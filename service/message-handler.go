@@ -8,12 +8,15 @@ import (
 // In particular, it creates a category with every channel specified
 // in the configuration file of the bot.
 func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
-	content := message.Content
-
-	// TODO: add a ! check at the beginning of the message
 	// If the message was sent to a channel different from the one used for categories creation
 	// or if the author of the message was the bot itself
 	if message.ChannelID != bot.buildChannelID || message.Author.ID == session.State.User.ID {
+		return
+	}
+	// Check whether the content of the message has the correct starting character
+	content, err := bot.SanitizeCommand(message.Content)
+	if err == ErrNotCommand {
+		bot.log.WithError(err).WithField("userID", message.Author).Error("Not a command meant for the bot.")
 		return
 	}
 
