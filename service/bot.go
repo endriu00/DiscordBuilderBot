@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// `ErrNotCommand` indicated the message content is not a command meant for the bot.
 var ErrNotCommand = errors.New("message content is not a command")
 
 // `Config` is the configuration for the bot.
@@ -32,6 +33,7 @@ type _bot struct {
 	channelsToCreate map[string]dgo.ChannelType
 }
 
+// `New` creates a `_bot` from a configuration `cfg`.
 func New(cfg Config) *_bot {
 	return &_bot{
 		guildID:          cfg.GuildID,
@@ -40,3 +42,15 @@ func New(cfg Config) *_bot {
 		channelsToCreate: cfg.ChannelsToCreate,
 	}
 }
+
+// `doneMessage` is the message indicating the channel was successfully created.
+const doneMessage = "Already done, pal!"
+
+// `errorMessage` is the message indicating an error has occurred.
+const errorMessage = "Looks like I am broken."
+
+// `notCommandMessage` is the message indicating an error made by the user.
+const notCommandMessage = "Names not starting with ! are not considered."
+
+// `catExistingMessage` is the message indicating the category already exists.
+const catExistsMessage = "This category already exists!"

@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/bwmarrin/discordgo"
+	"strings"
 )
 
 // `messageHandler` handles the event of the message creation.
@@ -17,6 +18,9 @@ func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.M
 	content, err := bot.SanitizeCommand(message.Content)
 	if err == ErrNotCommand {
 		bot.log.WithError(err).WithField("userID", message.Author).Error("Not a command meant for the bot.")
+		if err = bot.SendMessage(notCommandMessage, bot.buildChannelID, session); err != nil {
+			bot.log.WithError(err).Error("Error sending message")
+		}
 		return
 	}
 
@@ -26,11 +30,14 @@ func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.M
 	existingChans, err := session.GuildChannels(bot.guildID)
 	if err != nil {
 		bot.log.WithError(err).Error("Could not get every channel.")
+		if err = bot.SendMessage(errorMessage, bot.buildChannelID, session); err != nil {
+			bot.log.WithError(err).Error("Error sending message")
+		}
 		return
 	}
 
 	// Check whether the category already exists.
-	// If it exists, do not create it.
+	// If it exists, do not create it. Names are case insensitive.
 
 	// TODO: do not stress the bot for every message with a scan of every existing channel.
 	// But: see if it is convenient to sort channel names, then use a mergesort to find this.
@@ -39,8 +46,11 @@ func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.M
 		if elem.Type != discordgo.ChannelTypeGuildCategory {
 			continue
 		}
-		if content == elem.Name {
+		if strings.EqualFold(content, elem.Name) {
 			bot.log.Warn("Category already exists!")
+			if err = bot.SendMessage(catExistsMessage, bot.buildChannelID, session); err != nil {
+				bot.log.WithError(err).Error("Error sending message")
+			}
 			return
 		}
 	}
@@ -49,6 +59,9 @@ func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.M
 	category, err := session.GuildChannelCreate(bot.guildID, content, discordgo.ChannelTypeGuildCategory)
 	if err != nil {
 		bot.log.WithError(err).WithField("userID", message.Author).Error("Could not create category.")
+		if err = bot.SendMessage(errorMessage, bot.buildChannelID, session); err != nil {
+			bot.log.WithError(err).Error("Error sending message")
+		}
 		return
 	}
 
@@ -61,15 +74,16 @@ func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.M
 		})
 		if err != nil {
 			bot.log.WithError(err).WithField("userID", message.Author).WithField("channelName", chanName).Error("Could not create the channel.")
+			if err = bot.SendMessage(errorMessage, bot.buildChannelID, session); err != nil {
+				bot.log.WithError(err).Error("Error sending message")
+			}
 			return
 		}
 	}
 
-	// Send back a message
-	// TODO: create a function for sending messages. Send a message back when an error occurs
-	_, err = session.ChannelMessageSend(bot.buildChannelID, "Already done, pal!")
-	if err != nil {
-		bot.log.WithError(err).Error("Could not send a message.")
+	// Send back a message confirming everything has gone as expected
+	if err = bot.SendMessage(bot.buildChannelID, doneMessage, session); err != nil {
+		bot.log.WithError(err).Error("Error sending message.")
 		return
 	}
 }
