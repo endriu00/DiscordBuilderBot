@@ -82,7 +82,7 @@ func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.M
 	}
 
 	// Send back a message confirming everything has gone as expected
-	if err = bot.SendMessage(bot.buildChannelID, doneMessage, session); err != nil {
+	if err = bot.SendMessage(doneMessage, bot.buildChannelID, session); err != nil {
 		bot.log.WithError(err).Error("Error sending message.")
 		return
 	}
