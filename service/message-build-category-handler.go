@@ -8,7 +8,7 @@ import (
 // `messageHandler` handles the event of the message creation.
 // In particular, it creates a category with every channel specified
 // in the configuration file of the bot.
-func (bot *_bot) MessageHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
+func (bot *_bot) MessageBuildCategoryHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 	// If the message was sent to a channel different from the one used for categories creation
 	// or if the author of the message was the bot itself
 	if message.ChannelID != bot.buildChannelID || message.Author.ID == session.State.User.ID {

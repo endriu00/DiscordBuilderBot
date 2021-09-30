@@ -46,7 +46,7 @@ func run() error {
 	}
 
 	// Add handler messageHandler
-	handlerRemover := session.AddHandler(bot.MessageHandler)
+	handlerRemover := session.AddHandler(bot.MessageBuildCategoryHandler)
 	defer handlerRemover()
 
 	// Open a websocket towards Discord
