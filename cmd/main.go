@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	dgo "github.com/bwmarrin/discordgo"
-	"github.com/endriu00/DiscordBuilderBot/service"
+	handler "github.com/endriu00/DiscordBuilderBot/service/handler"
 	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
@@ -31,7 +31,7 @@ func run() error {
 	}
 
 	// Create bot
-	bot := service.New(service.Config{
+	bot := handler.New(handler.Config{
 		Log:              log,
 		GuildID:          cfg.GuildID,
 		BuildChannelID:   cfg.BuildChannelID,
