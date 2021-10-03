@@ -1,22 +1,52 @@
-package service
+package handler
 
 import (
+	"database/sql"
 	"github.com/bwmarrin/discordgo"
 )
 
 func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
-	// update the points the user has in the database
+	// Update the points the user has
 	userID := message.Author.ID
 	if err := bot.db.UpdateUserPoints(userID, 1); err != nil {
 		bot.log.WithError(err).WithField("userID", userID).Error("Could not update user points.")
 		return
 	}
-	bot.db.GetUserPoints()
 
-	// if user has enough points he will be promoted
-	// maybe change this in:
-	// user asks for promotion
-	// if he has enough points, he gets the promotion
-	// if not, the points he has are returned
+	// Get user points
+	points, err := bot.db.GetUserPoints(userID)
+	if err == sql.ErrNoRows {
+		bot.log.WithField("userID", userID).Warn("User is not registered!")
+		return
+	}
+	if err != nil {
+		bot.log.WithError(err).WithField("userID", userID).Error("Could not get user points.")
+		return
+	}
 
+	nextRole, err := bot.db.GetUserNextRole(userID)
+	if err == sql.ErrNoRows {
+		bot.log.Warn("Cannot promote again. Highest level.")
+		return
+	}
+	if err != nil {
+		bot.log.WithError(err).WithField("userID", userID).Error("Could not get next role.")
+		return
+	}
+	// If the user has enough points, promote him
+	if points >= nextRole.MinPoints {
+		if err = bot.db.AddUserRole(userID, nextRole.ID); err != nil {
+			bot.log.WithError(err).WithField("userID", userID).Error("Could not upgrade user role on the database.")
+			return
+		}
+	}
+
+	if err = session.GuildMemberRoleAdd(bot.guildID, userID, nextRole.ID); err != nil {
+		bot.log.WithError(err).WithField("userID", userID).Error("Could not upgrade user role on the server.")
+		return
+	}
+	if err = bot.SendMessage("Congratulation, "+message.Author.Username+"! You have been promoted to "+nextRole.Name+"!", message.ChannelID, session); err != nil {
+		bot.log.WithError(err).WithField("userID", userID).Error("Could not send message.")
+		return
+	}
 }

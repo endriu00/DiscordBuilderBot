@@ -1,8 +1,9 @@
-package service
+package handler
 
 import (
 	"errors"
 	dgo "github.com/bwmarrin/discordgo"
+	"github.com/endriu00/DiscordBuilderBot/service/db"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,6 +16,7 @@ type Config struct {
 	BuildChannelID   string
 	Log              *logrus.Entry
 	ChannelsToCreate map[string]dgo.ChannelType
+	DB               db.DB
 }
 
 // `_bot` represents the bot.
@@ -31,6 +33,9 @@ type _bot struct {
 
 	// `channelsToCreate` represents the name of the channels to be created.
 	channelsToCreate map[string]dgo.ChannelType
+
+	// `db` is the db the bot interacts to.
+	db db.DB
 }
 
 // `New` creates a `_bot` from a configuration `cfg`.
@@ -40,6 +45,7 @@ func New(cfg Config) *_bot {
 		buildChannelID:   cfg.BuildChannelID,
 		log:              cfg.Log,
 		channelsToCreate: cfg.ChannelsToCreate,
+		db:               cfg.DB,
 	}
 }
 

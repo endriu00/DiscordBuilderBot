@@ -4,16 +4,22 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type Stats struct {
-	Points    int
-	BanAlerts int
+// `Role` represents a role in the server.
+type Role struct {
+	ID        string
+	Name      string
+	MinPoints int
 }
 
+// `User` represents a user in the server.
 type User struct {
 	ID       string
 	Username string
+	Points   int
+	Bans     int
 }
 
+// `DB` is the database.
 type DB struct {
 	DB *sqlx.DB
 }
