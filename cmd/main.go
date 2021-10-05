@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	dgo "github.com/bwmarrin/discordgo"
+	"github.com/endriu00/DiscordBuilderBot/service/db"
 	handler "github.com/endriu00/DiscordBuilderBot/service/handler"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
@@ -30,12 +33,25 @@ func run() error {
 		return err
 	}
 
+	// Connect to the database
+	database, err := sqlx.Connect("postgres", "user=postgres password=Stella00. host=127.0.0.1 port=5432 dbname=discordbot sslmode=disable")
+	if err != nil {
+		sysLog.WithError(err).Error("Failed to connect to DB")
+		return err
+	}
+	botDB, err := db.New(database)
+	if err != nil {
+		sysLog.WithError(err).Error("Failed to create the database for the bot.")
+		return err
+	}
+
 	// Create bot
 	bot := handler.New(handler.Config{
 		Log:              log,
 		GuildID:          cfg.GuildID,
 		BuildChannelID:   cfg.BuildChannelID,
 		ChannelsToCreate: cfg.ChannelsToCreate,
+		DB:               botDB,
 	})
 
 	// Start a new discord session
@@ -48,6 +64,8 @@ func run() error {
 	// Add handler messageHandler
 	handlerRemover := session.AddHandler(bot.MessageBuildCategoryHandler)
 	defer handlerRemover()
+	handlerRemover2 := session.AddHandler(bot.MessageReceivedCountHandler)
+	defer handlerRemover2()
 
 	// Open a websocket towards Discord
 	if err = session.Open(); err != nil {

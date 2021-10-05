@@ -16,7 +16,7 @@ type Config struct {
 	BuildChannelID   string
 	Log              *logrus.Entry
 	ChannelsToCreate map[string]dgo.ChannelType
-	DB               db.DB
+	DB               *db.DB
 }
 
 // `_bot` represents the bot.
@@ -35,11 +35,12 @@ type _bot struct {
 	channelsToCreate map[string]dgo.ChannelType
 
 	// `db` is the db the bot interacts to.
-	db db.DB
+	db *db.DB
 }
 
 // `New` creates a `_bot` from a configuration `cfg`.
 func New(cfg Config) *_bot {
+	// TODO check whether everything has been initialized
 	return &_bot{
 		guildID:          cfg.GuildID,
 		buildChannelID:   cfg.BuildChannelID,

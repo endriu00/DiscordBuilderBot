@@ -23,3 +23,9 @@ type User struct {
 type DB struct {
 	DB *sqlx.DB
 }
+
+func New(db *sqlx.DB) (*DB, error) {
+	return &DB{
+		DB: db,
+	}, nil
+}

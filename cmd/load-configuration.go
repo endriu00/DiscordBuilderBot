@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	dgo "github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 	"os"
 )
 
@@ -17,6 +18,10 @@ type BotConfiguration struct {
 // `loadConfigurationFromEnv` load the configuration of the bot
 // from the environment variables.
 func loadConfigurationFromEnv() (BotConfiguration, error) {
+	err := godotenv.Load()
+	if err != nil {
+		return BotConfiguration{}, errors.New("cannot load environment variables")
+	}
 	guildID, _ := os.LookupEnv("GUILD_ID")
 	if guildID == "" {
 		return BotConfiguration{}, errors.New("environment variable does not exists or it is not set")
