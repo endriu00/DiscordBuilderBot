@@ -34,7 +34,7 @@ func run() error {
 	}
 
 	// Connect to the database
-	database, err := sqlx.Connect("postgres", "user=postgres password=Stella00. host=127.0.0.1 port=5432 dbname=discordbot sslmode=disable")
+	database, err := sqlx.Connect("postgres", "user=postgres password=password host=127.0.0.1 port=5432 dbname=discordbot sslmode=disable")
 	if err != nil {
 		sysLog.WithError(err).Error("Failed to connect to DB")
 		return err
@@ -61,11 +61,15 @@ func run() error {
 		return err
 	}
 
-	// Add handler messageHandler
-	handlerRemover := session.AddHandler(bot.MessageBuildCategoryHandler)
-	defer handlerRemover()
-	handlerRemover2 := session.AddHandler(bot.MessageReceivedCountHandler)
-	defer handlerRemover2()
+	// Add message creation handlers
+	handlerRemoverBuild := session.AddHandler(bot.MessageBuildCategoryHandler)
+	defer handlerRemoverBuild()
+	handlerRemoverCount := session.AddHandler(bot.MessageReceivedCountHandler)
+	defer handlerRemoverCount()
+
+	// Add user joining the server handlers
+	handlerRemoverJoin := session.AddHandler(bot.UserJoinHandler)
+	defer handlerRemoverJoin()
 
 	// Open a websocket towards Discord
 	if err = session.Open(); err != nil {

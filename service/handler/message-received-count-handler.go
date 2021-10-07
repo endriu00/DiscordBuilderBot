@@ -17,6 +17,12 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 	points, err := bot.db.GetUserPoints(userID)
 	if err == sql.ErrNoRows {
 		bot.log.WithField("userID", userID).Warn("User is not registered!")
+		// TO BE CHANGED. USED THIS TO DO A SEAMLESS CREATION OF THE DB.
+		err = bot.db.AddUser(userID, message.Author.Username)
+		if err != nil {
+			bot.log.WithError(err).Error("Could not create the user.")
+			return
+		}
 		return
 	}
 	if err != nil {
