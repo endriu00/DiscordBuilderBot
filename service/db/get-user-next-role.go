@@ -8,7 +8,7 @@ func (db *DB) GetUserNextRole(userID string) (Role, error) {
 		`SELECT role.id, role.name, role.min_points 
 	FROM role JOIN rank ON role.id=rank.role_id
 	WHERE role.id NOT IN rank.role_id 
-	AND user_id=?
+	AND user_id=S1
 	ORDER BY role.min_points ASC LIMIT 1`, userID)
 	if err != nil {
 		return role, err

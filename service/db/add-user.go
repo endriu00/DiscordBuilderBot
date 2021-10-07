@@ -7,7 +7,7 @@ func (db *DB) AddUser(userID, username string) error {
 	if err != nil {
 		return err
 	}
-	_, err = tx.Exec("INSERT INTO discord_user(id, username) VALUES (?, ?)", userID, username)
+	_, err = tx.Exec("INSERT INTO discord_user(id, username) VALUES ($1, $2)", userID, username)
 	if err != nil {
 		tx.Rollback()
 		return err

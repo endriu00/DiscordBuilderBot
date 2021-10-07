@@ -6,6 +6,10 @@ import (
 )
 
 func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
+	//If the author of the message was the bot itself
+	if message.Author.ID == session.State.User.ID {
+		return
+	}
 	// Update the points the user has
 	userID := message.Author.ID
 	if err := bot.db.UpdateUserPoints(userID, 1); err != nil {

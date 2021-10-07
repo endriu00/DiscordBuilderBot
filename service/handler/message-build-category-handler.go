@@ -17,7 +17,7 @@ func (bot *_bot) MessageBuildCategoryHandler(session *discordgo.Session, message
 	// Check whether the content of the message has the correct starting character
 	content, err := bot.SanitizeCommand(message.Content)
 	if err == ErrNotCommand {
-		bot.log.WithError(err).WithField("userID", message.Author).Error("Not a command meant for the bot.")
+		bot.log.WithError(err).WithField("userID", message.Author.ID).Error("Not a command meant for the bot.")
 		if err = bot.SendMessage(notCommandMessage, bot.buildChannelID, session); err != nil {
 			bot.log.WithError(err).Error("Error sending message")
 		}
@@ -58,7 +58,7 @@ func (bot *_bot) MessageBuildCategoryHandler(session *discordgo.Session, message
 	// Create the category first
 	category, err := session.GuildChannelCreate(bot.guildID, content, discordgo.ChannelTypeGuildCategory)
 	if err != nil {
-		bot.log.WithError(err).WithField("userID", message.Author).Error("Could not create category.")
+		bot.log.WithError(err).WithField("userID", message.Author.ID).Error("Could not create category.")
 		if err = bot.SendMessage(errorMessage, bot.buildChannelID, session); err != nil {
 			bot.log.WithError(err).Error("Error sending message")
 		}
@@ -73,7 +73,7 @@ func (bot *_bot) MessageBuildCategoryHandler(session *discordgo.Session, message
 			ParentID: category.ID,
 		})
 		if err != nil {
-			bot.log.WithError(err).WithField("userID", message.Author).WithField("channelName", chanName).Error("Could not create the channel.")
+			bot.log.WithError(err).WithField("userID", message.Author.ID).WithField("channelName", chanName).Error("Could not create the channel.")
 			if err = bot.SendMessage(errorMessage, bot.buildChannelID, session); err != nil {
 				bot.log.WithError(err).Error("Error sending message")
 			}
