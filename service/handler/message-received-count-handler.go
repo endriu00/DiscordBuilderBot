@@ -5,6 +5,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// `MessageReceivedCountHandler` handles the event of a user sending a message to the server.
+// It updates user points of a pre-established amount, checks if it is necessary to promote
+// the user, and, in that case, it sends a message to the server notifying him.
 func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 	//If the author of the message was the bot itself
 	if message.Author.ID == session.State.User.ID {
