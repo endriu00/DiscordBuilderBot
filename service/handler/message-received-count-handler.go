@@ -49,14 +49,14 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 			bot.log.WithError(err).WithField("userID", userID).Error("Could not upgrade user role on the database.")
 			return
 		}
-	}
 
-	if err = session.GuildMemberRoleAdd(bot.guildID, userID, nextRole.ID); err != nil {
-		bot.log.WithError(err).WithField("userID", userID).Error("Could not upgrade user role on the server.")
-		return
-	}
-	if err = bot.SendMessage("Congratulation, "+message.Author.Username+"! You have been promoted to "+nextRole.Name+"!", message.ChannelID, session); err != nil {
-		bot.log.WithError(err).WithField("userID", userID).Error("Could not send message.")
-		return
+		if err = session.GuildMemberRoleAdd(bot.guildID, userID, nextRole.ID); err != nil {
+			bot.log.WithError(err).WithField("userID", userID).Error("Could not upgrade user role on the server.")
+			return
+		}
+		if err = bot.SendMessage("Congratulation, "+message.Author.Username+"! You have been promoted to "+nextRole.Name+"!", message.ChannelID, session); err != nil {
+			bot.log.WithError(err).WithField("userID", userID).Error("Could not send message.")
+			return
+		}
 	}
 }
