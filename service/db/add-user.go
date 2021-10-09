@@ -1,17 +1,15 @@
 package db
 
-import ()
+import (
+	"context"
+)
 
-func (db *DB) AddUser(userID, username string) error {
-	tx, err := db.DB.Begin()
+// `AddUser` adds the user with ID `userID` and username `username` to the database.
+// A context `ctx` is used for the database connection.
+func (db *DB) AddUser(userID, username string, ctx context.Context) error {
+	_, err := db.DB.Exec(ctx, "INSERT INTO discord_user(id, username, points, ban_alerts) VALUES ($1, $2, 0, 0)", userID, username)
 	if err != nil {
 		return err
 	}
-	_, err = tx.Exec("INSERT INTO discord_user(id, username) VALUES ($1, $2)", userID, username)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	tx.Commit()
 	return nil
 }

@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	dgo "github.com/bwmarrin/discordgo"
 	"github.com/endriu00/DiscordBuilderBot/service/db"
 	handler "github.com/endriu00/DiscordBuilderBot/service/handler"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	pgx "github.com/jackc/pgx/v4/pgxpool"
 	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
@@ -33,12 +33,21 @@ func run() error {
 		return err
 	}
 
-	// Connect to the database
-	database, err := sqlx.Connect("postgres", "user=postgres password=password host=127.0.0.1 port=5432 dbname=discordbot sslmode=disable")
+	// Define an empty context. Can be managed and extended in future versions
+	ctx := context.Background()
+
+	// Connect to the database and ping it
+	database, err := pgx.Connect(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
 		sysLog.WithError(err).Error("Failed to connect to DB")
 		return err
 	}
+	if err = database.Ping(ctx); err != nil {
+		sysLog.WithError(err).Error("Database is not responding")
+		return err
+	}
+
+	// Initialize the database for the bot
 	botDB, err := db.New(database)
 	if err != nil {
 		sysLog.WithError(err).Error("Failed to create the database for the bot.")
@@ -85,6 +94,7 @@ func run() error {
 
 	// Make channel for receiving signals.
 	// The channel blocks the execution of the function.
+	// It stays blocked until it receives some system signals.
 	signalChan := make(chan os.Signal, 1)
 	sysLog.Info("Bot is listening.")
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)

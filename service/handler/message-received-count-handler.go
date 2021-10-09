@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"database/sql"
 	"github.com/bwmarrin/discordgo"
 )
@@ -9,23 +10,25 @@ import (
 // It updates user points of a pre-established amount, checks if it is necessary to promote
 // the user, and, in that case, it sends a message to the server notifying him.
 func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
+	ctx := context.Background()
+
 	//If the author of the message was the bot itself
 	if message.Author.ID == session.State.User.ID {
 		return
 	}
 	// Update the points the user has
 	userID := message.Author.ID
-	if err := bot.db.UpdateUserPoints(userID, 1); err != nil {
+	if err := bot.db.UpdateUserPoints(userID, 1, ctx); err != nil {
 		bot.log.WithError(err).WithField("userID", userID).Error("Could not update user points.")
 		return
 	}
 
 	// Get user points
-	points, err := bot.db.GetUserPoints(userID)
+	points, err := bot.db.GetUserPoints(userID, ctx)
 	if err == sql.ErrNoRows {
 		bot.log.WithField("userID", userID).Warn("User is not registered!")
 		// TO BE CHANGED. USED THIS TO DO A SEAMLESS CREATION OF THE DB.
-		err = bot.db.AddUser(userID, message.Author.Username)
+		err = bot.db.AddUser(userID, message.Author.Username, ctx)
 		if err != nil {
 			bot.log.WithError(err).Error("Could not create the user.")
 			return
@@ -37,7 +40,7 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 		return
 	}
 
-	nextRole, err := bot.db.GetUserNextRole(userID)
+	nextRole, err := bot.db.GetUserNextRole(userID, ctx)
 	if err == sql.ErrNoRows {
 		bot.log.Warn("Cannot promote again. Highest level.")
 		return
@@ -48,7 +51,7 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 	}
 	// If the user has enough points, promote him
 	if points >= nextRole.MinPoints {
-		if err = bot.db.AddUserRole(userID, nextRole.ID); err != nil {
+		if err = bot.db.AddUserRole(userID, nextRole.ID, ctx); err != nil {
 			bot.log.WithError(err).WithField("userID", userID).Error("Could not upgrade user role on the database.")
 			return
 		}
