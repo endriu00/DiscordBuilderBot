@@ -5,7 +5,7 @@ import (
 	"fmt"
 	dgo "github.com/bwmarrin/discordgo"
 	"github.com/endriu00/DiscordBuilderBot/service/db"
-	handler "github.com/endriu00/DiscordBuilderBot/service/handler"
+	"github.com/endriu00/DiscordBuilderBot/service/handler"
 	pgx "github.com/jackc/pgx/v4/pgxpool"
 	"github.com/sirupsen/logrus"
 	"os"

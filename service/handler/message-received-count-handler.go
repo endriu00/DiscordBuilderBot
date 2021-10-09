@@ -6,21 +6,37 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// TODO: instead of checking for each message received the points the user has left
+// to the next role, store in a in-memory buffer the latest amount of points received
+// and update it instead of the database. Connect to the database every now and then
+// in order to avoid stressing it. THINK ABOUT A SIMILAR SOLUTION.
+
 // `MessageReceivedCountHandler` handles the event of a user sending a message to the server.
 // It updates user points of a pre-established amount, checks if it is necessary to promote
 // the user, and, in that case, it sends a message to the server notifying him.
 func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message *discordgo.MessageCreate) {
 	ctx := context.Background()
+	userID := message.Author.ID
 
-	//If the author of the message was the bot itself
-	if message.Author.ID == session.State.User.ID {
+	// If the author of the message was the bot itself
+	if userID == session.State.User.ID {
 		return
 	}
-	// Update the points the user has
-	userID := message.Author.ID
-	if err := bot.db.UpdateUserPoints(userID, 1, ctx); err != nil {
-		bot.log.WithError(err).WithField("userID", userID).Error("Could not update user points.")
-		return
+
+	// TODO: Check if the message is a good message or a bad message
+
+	// Update the points the user has considering the type of the message sent.
+	switch message.Type {
+	case discordgo.MessageTypeDefault:
+		if err := bot.db.UpdateUserPoints(userID, messageSentPoints, ctx); err != nil {
+			bot.log.WithError(err).WithField("userID", userID).Error("Could not update user points.")
+			return
+		}
+	case discordgo.MessageTypeReply:
+		if err := bot.db.UpdateUserPoints(userID, messageReplyPoints, ctx); err != nil {
+			bot.log.WithError(err).WithField("userID", userID).Error("Could not update user points.")
+			return
+		}
 	}
 
 	// Get user points
@@ -40,6 +56,7 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 		return
 	}
 
+	// Get user next role for the server
 	nextRole, err := bot.db.GetUserNextRole(userID, ctx)
 	if err == sql.ErrNoRows {
 		bot.log.Warn("Cannot promote again. Highest level.")

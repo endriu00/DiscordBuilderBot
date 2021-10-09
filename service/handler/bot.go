@@ -7,6 +7,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Constants for message strings.
+const (
+	// `doneMessage` is the message indicating the channel was successfully created.
+	doneMessage = "Already done, pal!"
+
+	// `errorMessage` is the message indicating an error has occurred.
+	errorMessage = "Looks like I am broken."
+
+	// `notCommandMessage` is the message indicating an error made by the user.
+	notCommandMessage = "Names not starting with ! are not considered."
+
+	// `catExistingMessage` is the message indicating the category already exists.
+	catExistsMessage = "This category already exists!"
+
+	// `messageSentPoints` represents the points the user receives when sending a message.
+	messageSentPoints = 1
+
+	// `messageReplyPoints` represents the points the user receives when replying
+	// to a message.
+	messageReplyPoints = 2
+)
+
 // `ErrNotCommand` indicated the message content is not a command meant for the bot.
 var ErrNotCommand = errors.New("message content is not a command")
 
@@ -49,15 +71,3 @@ func New(cfg Config) *_bot {
 		db:               cfg.DB,
 	}
 }
-
-// `doneMessage` is the message indicating the channel was successfully created.
-const doneMessage = "Already done, pal!"
-
-// `errorMessage` is the message indicating an error has occurred.
-const errorMessage = "Looks like I am broken."
-
-// `notCommandMessage` is the message indicating an error made by the user.
-const notCommandMessage = "Names not starting with ! are not considered."
-
-// `catExistingMessage` is the message indicating the category already exists.
-const catExistsMessage = "This category already exists!"
