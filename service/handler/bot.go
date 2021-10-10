@@ -21,6 +21,9 @@ const (
 	// `catExistingMessage` is the message indicating the category already exists.
 	catExistsMessage = "This category already exists!"
 
+	//`badCategoryMessage` is the message indicating the category is not appropriate.
+	badCategoryMessage = "This category could not be so appropriate."
+
 	// `messageSentPoints` represents the points the user receives when sending a message.
 	messageSentPoints = 1
 
@@ -29,8 +32,13 @@ const (
 	messageReplyPoints = 2
 )
 
-// `ErrNotCommand` indicated the message content is not a command meant for the bot.
+// `ErrNotCommand` indicates the message content is not a command meant for the bot.
 var ErrNotCommand = errors.New("message content is not a command")
+
+// `Categories` are the categories that can be created by the bot.
+var Categories = []string{"electronics", "cyber security", "cryptocurrencies",
+	"coding", "artificial intelligence", "development", "software engineering",
+	"diy"}
 
 // `Config` is the configuration for the bot.
 type Config struct {

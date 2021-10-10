@@ -14,6 +14,7 @@ func (bot *_bot) MessageBuildCategoryHandler(session *discordgo.Session, message
 	if message.ChannelID != bot.buildChannelID || message.Author.ID == session.State.User.ID {
 		return
 	}
+
 	// Check whether the content of the message has the correct starting character
 	content, err := bot.SanitizeCommand(message.Content)
 	if err == ErrNotCommand {
@@ -24,7 +25,20 @@ func (bot *_bot) MessageBuildCategoryHandler(session *discordgo.Session, message
 		return
 	}
 
-	// TODO: Check whether the message content is a topic that sticks to computer science related topics.
+	// Check whether the message content belongs to computer science field
+	isOk := false
+	for _, elem := range Categories {
+		if strings.EqualFold(content, elem) {
+			isOk = true
+		}
+	}
+	if !isOk {
+		bot.log.WithField("userID", message.Author.ID).Error("Not an appropriate category for this server.")
+		if err = bot.SendMessage(badCategoryMessage, bot.buildChannelID, session); err != nil {
+			bot.log.WithError(err).Error("Error sending message")
+			return
+		}
+	}
 
 	// Get the list of every channel in the guild
 	existingChans, err := session.GuildChannels(bot.guildID)
@@ -40,7 +54,7 @@ func (bot *_bot) MessageBuildCategoryHandler(session *discordgo.Session, message
 	// If it exists, do not create it. Names are case insensitive.
 
 	// TODO: do not stress the bot for every message with a scan of every existing channel.
-	// But: see if it is convenient to sort channel names, then use a mergesort to find this.
+	// But: see if it is convenient to sort channel names, then use a binary search to find this.
 	for _, elem := range existingChans {
 		// Skip channels that are not categories
 		if elem.Type != discordgo.ChannelTypeGuildCategory {
