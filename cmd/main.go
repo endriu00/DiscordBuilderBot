@@ -56,11 +56,12 @@ func run() error {
 
 	// Create bot
 	bot := handler.New(handler.Config{
-		Log:              log,
-		GuildID:          cfg.GuildID,
-		BuildChannelID:   cfg.BuildChannelID,
-		ChannelsToCreate: cfg.ChannelsToCreate,
-		DB:               botDB,
+		Log:                log,
+		GuildID:            cfg.GuildID,
+		BuildChannelID:     cfg.BuildChannelID,
+		GetPointsChannelID: cfg.GetPointsChannelID,
+		ChannelsToCreate:   cfg.ChannelsToCreate,
+		DB:                 botDB,
 	})
 
 	// Start a new discord session
@@ -75,6 +76,8 @@ func run() error {
 	defer handlerRemoverBuild()
 	handlerRemoverCount := session.AddHandler(bot.MessageReceivedCountHandler)
 	defer handlerRemoverCount()
+	handlerRemoverPoints := session.AddHandler(bot.MessageGetPointsHandler)
+	defer handlerRemoverPoints()
 
 	// Add user joining the server handlers
 	handlerRemoverJoin := session.AddHandler(bot.UserJoinHandler)

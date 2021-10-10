@@ -24,6 +24,13 @@ const (
 	//`badCategoryMessage` is the message indicating the category is not appropriate.
 	badCategoryMessage = "This category could not be so appropriate."
 
+	// `pointsMessage` is the message the bot sends when user requests the points.
+	pointsMessage = "Points: "
+
+	// `notGetPointsMessage` is the message indicating the message sent
+	// is not the command for getting the points.
+	notGetPointsMessage = "This is not the right command for this place! Try `!points`"
+
 	// `messageSentPoints` represents the points the user receives when sending a message.
 	messageSentPoints = 1
 
@@ -42,11 +49,12 @@ var Categories = []string{"electronics", "cyber security", "cryptocurrencies",
 
 // `Config` is the configuration for the bot.
 type Config struct {
-	GuildID          string
-	BuildChannelID   string
-	Log              *logrus.Entry
-	ChannelsToCreate map[string]dgo.ChannelType
-	DB               *db.DB
+	GuildID            string
+	BuildChannelID     string
+	GetPointsChannelID string
+	Log                *logrus.Entry
+	ChannelsToCreate   map[string]dgo.ChannelType
+	DB                 *db.DB
 }
 
 // `_bot` represents the bot.
@@ -58,7 +66,11 @@ type _bot struct {
 	// a new category.
 	buildChannelID string
 
-	// `log` is the logger
+	// `getPointsChannelID` is the ID of the channel where user can check
+	// their points.
+	getPointsChannelID string
+
+	// `log` is the logger.
 	log *logrus.Entry
 
 	// `channelsToCreate` represents the name of the channels to be created.
@@ -72,10 +84,11 @@ type _bot struct {
 func New(cfg Config) *_bot {
 	// TODO check whether everything has been initialized
 	return &_bot{
-		guildID:          cfg.GuildID,
-		buildChannelID:   cfg.BuildChannelID,
-		log:              cfg.Log,
-		channelsToCreate: cfg.ChannelsToCreate,
-		db:               cfg.DB,
+		guildID:            cfg.GuildID,
+		buildChannelID:     cfg.BuildChannelID,
+		getPointsChannelID: cfg.GetPointsChannelID,
+		log:                cfg.Log,
+		channelsToCreate:   cfg.ChannelsToCreate,
+		db:                 cfg.DB,
 	}
 }

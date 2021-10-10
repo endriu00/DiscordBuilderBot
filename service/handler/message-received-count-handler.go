@@ -25,6 +25,13 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 		return
 	}
 
+	// If the command starts for ! do not consider it
+	_, err := bot.SanitizeCommand(message.Content)
+	if err == nil {
+		bot.log.Info("Not considering the message because it is a command")
+		return
+	}
+
 	// TODO: Check if the message is a good message or a bad message
 
 	// Update the points the user has considering the type of the message sent.
@@ -37,12 +44,8 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 	default:
 		return
 	}
-	if err := bot.db.UpdateUserPoints(userID, pointsWorth, ctx); err != nil {
-		bot.log.WithError(err).WithField("userID", userID).Error("Could not update user points.")
-		return
-	}
 
-	// Get user points
+	// Get user points before the update
 	points, err := bot.db.GetUserPoints(userID, ctx)
 	if err == pgx.ErrNoRows {
 		bot.log.WithField("userID", userID).Warn("User is not registered!")
@@ -52,10 +55,15 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 			bot.log.WithError(err).Error("Could not create the user.")
 			return
 		}
-		return
 	}
 	if err != nil {
 		bot.log.WithError(err).WithField("userID", userID).Error("Could not get user points.")
+		return
+	}
+
+	// Update user points
+	if err := bot.db.UpdateUserPoints(userID, pointsWorth, ctx); err != nil {
+		bot.log.WithError(err).WithField("userID", userID).Error("Could not update user points.")
 		return
 	}
 
@@ -71,7 +79,7 @@ func (bot *_bot) MessageReceivedCountHandler(session *discordgo.Session, message
 	}
 
 	// If the user has enough points, promote him
-	if points >= nextRole.MinPoints {
+	if (points + pointsWorth) >= nextRole.MinPoints {
 		if err = bot.db.AddUserRole(userID, nextRole.ID, ctx); err != nil {
 			bot.log.WithError(err).WithField("userID", userID).Error("Could not upgrade user role on the database.")
 			return
