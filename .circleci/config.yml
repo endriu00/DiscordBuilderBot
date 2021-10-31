@@ -1,0 +1,25 @@
+version: 2.1
+
+# Define orbs the pipeline will use
+orbs:
+  docker: circleci/docker@1.7.0
+
+# Workflow of the pipeline
+workflows:
+  # build-and-publish builds the docker image and publishes it
+  build-and-publish:
+    jobs: 
+      - docker/publish:
+          # username and password of the docker registry
+          docker-username: $DOCKER_HUB_USERNAME
+          docker-password: $DOCKER_HUB_PASSWORD
+          # image name
+          image: discordbuilderbot
+          # image tag
+          tag: 0.1
+          # whether deploy the image to the registry when built
+          deploy: true
+          branches: 
+            only: 
+              - master
+
