@@ -10,7 +10,10 @@ workflows:
   build-and-publish:
     jobs: 
       - docker/publish:
+          context:
+            - settings
           # username and password of the docker registry
+          use-docker-credentials-store: true
           docker-password: DOCKER_HUB_PASSWORD
           docker-username: DOCKER_HUB_USERNAME
           # image name
