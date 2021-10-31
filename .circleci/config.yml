@@ -16,7 +16,7 @@ workflows:
           use-docker-credentials-store: true
           docker-password: DOCKER_HUB_PASSWORD
           docker-username: DOCKER_HUB_USERNAME
-          registry: https://hub.docker.com/repository/docker/endriu00/discordbuilderbot 
+          registry: endriu00/discordbuilderbot
           # image name
           image: discordbuilderbot
           # image tag
