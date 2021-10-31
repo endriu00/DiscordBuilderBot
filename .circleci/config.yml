@@ -11,9 +11,8 @@ workflows:
     jobs: 
       - docker/publish:
           # username and password of the docker registry
-          use-docker-credentials-store: true
-          docker-username: DOCKER_HUB_USERNAME
           docker-password: DOCKER_HUB_PASSWORD
+          docker-username: DOCKER_HUB_USERNAME
           # image name
           image: discordbuilderbot
           # image tag
