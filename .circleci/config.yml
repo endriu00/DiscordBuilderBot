@@ -17,7 +17,7 @@ workflows:
           docker-password: DOCKER_HUB_PASSWORD
           docker-username: DOCKER_HUB_USERNAME
           # image name
-          image: discordbuilderbot
+          image: endriu00/discordbuilderbot
           # image tag
           tag: "0.1"
           # whether deploy the image to the registry when built
